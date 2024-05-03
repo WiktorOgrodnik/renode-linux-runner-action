@@ -49,10 +49,6 @@ def configure_board(user_directory: str, device_config: str, arch: str, board: s
         custom repl: URL or path
     """
 
-    if device_config != "none":
-        get_file(device_config, "action/device/")
-        return ("n", "custom")
-
     if arch not in archs:
         error("Architecture not supportted!")
 
