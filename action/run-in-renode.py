@@ -33,7 +33,7 @@ DEFAULT_IMAGE_PATH = "https://github.com/{}/releases/download/{}/image-{}-defaul
 DEFAULT_KERNEL_PATH = "https://github.com/{}/releases/download/{}/kernel-{}-{}.tar.xz"
 
 
-def configure_board(device_config: str, arch: str, board: str, resc: str, repl: str):
+def configure_board(user_directory: str, device_config: str, arch: str, board: str, resc: str, repl: str):
     """
     Set the appropriate board resc and repl
 
@@ -63,10 +63,10 @@ def configure_board(device_config: str, arch: str, board: str, resc: str, repl: 
         error("You have to provide resc and repl for custom board")
 
     if resc != "default":
-        get_file(resc, f"action/device/{board}/init.resc")
+        get_file(f"{user_directory}/{resc}", f"action/device/{board}/init.resc")
 
     if repl != "default":
-        get_file(repl, f"action/device/{board}/platform.repl")
+        get_file(f"{user_directory}/{repl}", f"action/device/{board}/platform.repl")
 
     return (arch, board)
 
@@ -104,6 +104,7 @@ if __name__ == "__main__":
     action_ref = sys.argv[4]
 
     arch, board = configure_board(
+        user_directory,
         args.get("device-config", "none"),
         args.get("arch", "riscv64"),
         args.get("board", "default"),
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     elif kernel.strip() == "":
         kernel = DEFAULT_KERNEL_PATH.format(action_repo, action_ref, arch, board)
 
-    prepare_kernel_and_initramfs(kernel)
+    prepare_kernel_and_initramfs(user_directory, kernel)
 
     prepare_shared_directories(args.get("shared-dirs", ""))
 

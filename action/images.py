@@ -84,7 +84,7 @@ def prepare_shared_directories(shared_directories: str):
             )
 
 
-def prepare_kernel_and_initramfs(kernel: str):
+def prepare_kernel_and_initramfs(user_directory: str, kernel: str):
     """
     Get the kernel package (kernel + initramfs + bootlader + firmware) and extract kernel and device tree from cpio archive.
 
@@ -94,7 +94,7 @@ def prepare_kernel_and_initramfs(kernel: str):
         path or URL to the kernel package
     """
 
-    get_file(kernel, "kernel.tar.xz")
+    get_file(f"{user_directory}/{kernel}", "kernel.tar.xz")
 
     os.makedirs("images")
 
