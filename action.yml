@@ -14,25 +14,25 @@ inputs:
   shared-dirs:
     description: Paths to shared directories
     required: false
-    default:
+    default: ""
   devices:
     description: Devices to set up
     required: false
     default: ""
   arch:
-    despription: Processor architecture (currently only riscv64)
+    description: Processor architecture (currently only riscv64)
     required: false
     default: riscv64
   board:
-    despription: Board
+    description: Board
     required: false
     default: default
   resc:
-    despription: Renode script
+    description: Renode script
     required: false
     default: default
   repl:
-    despription: Renode platform description
+    description: Renode platform description
     required: false
     default: default
   kernel:
@@ -40,7 +40,7 @@ inputs:
     required: false
     default: ""
   image-type:
-    desctiption: Type of the root filesystem method (currently only 'native')
+    description: Type of the root filesystem method (currently only 'native')
     required: false
     default: native
   image:
@@ -58,7 +58,7 @@ inputs:
   network:
     description: Enable network in the emulated Linux? true/false
     required: false
-    default: true
+    default: "true"
   rootfs-size:
     description: Rootfs size
     required: false
@@ -66,7 +66,11 @@ inputs:
   fail-fast:
     description: Fail fast
     required: false
-    default: true
+    default: "true"
+  device-config:
+    description: Renode device configuration (example at action/devices)
+    required: false
+    default: ""
   tasks:
     description: Add your tasks to the existing configuration
     required: false

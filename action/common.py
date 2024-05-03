@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from os.path import isdir
 from urllib.parse import urlparse
 from typing import Dict
 
@@ -138,7 +139,7 @@ def get_file(path_or_url: str, target_path: str):
     if target_path.find('/') != -1:
         os.makedirs("/".join(target_path.split("/")[:-1]), exist_ok=True)
 
-    if os.path.isfile(path_or_url):
+    if os.path.isfile(path_or_url) or os.path.isdir(path_or_url):
         shutil.move(path_or_url, target_path)
     elif is_url(path_or_url):
         try:

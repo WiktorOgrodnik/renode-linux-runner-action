@@ -33,7 +33,7 @@ DEFAULT_IMAGE_PATH = "https://github.com/{}/releases/download/{}/image-{}-defaul
 DEFAULT_KERNEL_PATH = "https://github.com/{}/releases/download/{}/kernel-{}-{}.tar.xz"
 
 
-def configure_board(arch: str, board: str, resc: str, repl: str):
+def configure_board(device_config: str, arch: str, board: str, resc: str, repl: str):
     """
     Set the appropriate board resc and repl
 
@@ -48,6 +48,10 @@ def configure_board(arch: str, board: str, resc: str, repl: str):
     repl: str
         custom repl: URL or path
     """
+
+    if device_config != "none":
+        get_file(device_config, "action/device/")
+        return ("n", "custom")
 
     if arch not in archs:
         error("Architecture not supportted!")
@@ -85,21 +89,26 @@ def test_task(test_task_str: str):
 if __name__ == "__main__":
     if len(sys.argv) != 5:
         error("Wrong number of arguments")
-
+    
+    args = None
     try:
-        args: dict[str, str] = json.loads(sys.argv[1])
+        args: dict[str, str] | None = json.loads(sys.argv[1])
     except json.decoder.JSONDecodeError:
         error(f"JSON decoder error for string: {sys.argv[1]}")
+
+    if args is None:
+        sys.exit(1)
 
     user_directory = sys.argv[2]
     action_repo = sys.argv[3]
     action_ref = sys.argv[4]
 
     arch, board = configure_board(
+        args.get("device-config", "none"),
         args.get("arch", "riscv64"),
         args.get("board", "default"),
         args.get("resc", "default"),
-        args.get("repl", "default")
+        args.get("repl", "default"),
     )
 
     kernel = args.get("kernel", "")
