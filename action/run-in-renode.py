@@ -85,7 +85,7 @@ def test_task(test_task_str: str):
 if __name__ == "__main__":
     if len(sys.argv) != 5:
         error("Wrong number of arguments")
-    
+
     args = None
     try:
         args: dict[str, str] | None = json.loads(sys.argv[1])
@@ -129,13 +129,14 @@ if __name__ == "__main__":
     if image.strip() == "":
         image = DEFAULT_IMAGE_PATH.format(action_repo, action_ref, arch)
 
-    burn_rootfs_image(
-        user_directory,
-        image,
-        arch,
-        args.get("rootfs-size", "auto"),
-        args.get("image-type", "native")
-    )
+    if image != "none":
+        burn_rootfs_image(
+            user_directory,
+            image,
+            arch,
+            args.get("rootfs-size", "auto"),
+            args.get("image-type", "native")
+        )
 
     for it, custom_task in enumerate(args.get("tasks", "").splitlines()):
         get_file(custom_task, f"action/user_tasks/task{it}.yml")
@@ -157,7 +158,9 @@ if __name__ == "__main__":
     dispatcher.evaluate()
 
     run(["mkdir", "rootfs"], check=True)
-    run(["sudo", "mount", "images/rootfs.img", "rootfs"], check=True)
+
+    if image != "none":
+        run(["sudo", "mount", "images/rootfs.img", "rootfs"], check=True)
 
     for dir in shared_directories_actions:
         src = f"rootfs/{dir.target}"
