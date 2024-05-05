@@ -1,0 +1,7 @@
+name: renode_network
+shell: renode
+requires: [renode_config]
+echo: true
+timeout: 10
+fail-fast: true
+sleep: 0
