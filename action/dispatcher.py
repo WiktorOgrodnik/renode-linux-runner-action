@@ -153,7 +153,11 @@ class CommandDispatcher:
         self.tasks[task.name] = task
 
     def enable_task(self, name: str, value: bool) -> None:
-        self.tasks[name].enable(value)
+        try:
+            self.tasks[name].enable(value)
+        except KeyError:
+            if value:
+                raise KeyError
 
     def delete_task(self, name: str) -> None:
         """

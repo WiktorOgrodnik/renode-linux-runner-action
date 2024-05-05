@@ -153,7 +153,6 @@ if __name__ == "__main__":
         kernel = DEFAULT_KERNEL_PATH.format(action_repo, action_ref, arch, board)
 
     prepare_kernel_and_initramfs(user_directory, kernel)
-
     prepare_shared_directories(args.get("shared-dirs", ""))
 
     devices = add_devices(args.get("devices", ""))
