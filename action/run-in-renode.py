@@ -16,9 +16,14 @@ from command import Task
 from common import get_file, error, archs
 from devices import add_devices
 from dependencies import add_repos, add_packages
-from images import prepare_shared_directories, prepare_kernel_and_initramfs, burn_rootfs_image, shared_directories_actions
+from images import (
+    prepare_shared_directories,
+    prepare_kernel_and_initramfs,
+    burn_rootfs_image,
+    shared_directories_actions)
 from dispatcher import CommandDispatcher
 from subprocess import run
+from typing import Dict
 
 from datetime import datetime
 
@@ -33,7 +38,17 @@ DEFAULT_IMAGE_PATH = "https://github.com/{}/releases/download/{}/image-{}-defaul
 DEFAULT_KERNEL_PATH = "https://github.com/{}/releases/download/{}/kernel-{}-{}.tar.xz"
 
 
-def configure_board(user_directory: str, device_config: str, arch: str, board: str, resc: str, repl: str):
+commands = [
+   ["mkdir", "rootfs"]
+]
+
+
+def configure_board(user_directory: str,
+                    _: str,
+                    arch: str,
+                    board: str,
+                    resc: str,
+                    repl: str):
     """
     Set the appropriate board resc and repl
 
@@ -82,6 +97,29 @@ def test_task(test_task_str: str):
         return Task.from_multiline_string("action_test", test_task_str, params=params)
 
 
+def prepare_image(user_directory: str,
+                  image: str,
+                  arch: str,
+                  rootfs_size: str,
+                  image_type: str):
+
+    if image == "none":
+        return
+
+    if image.strip() == "":
+        image = DEFAULT_IMAGE_PATH.format(action_repo, action_ref, arch)
+
+    burn_rootfs_image(
+        user_directory,
+        image,
+        arch,
+        rootfs_size,
+        image_type,
+    )
+
+    commands.append(["sudo", "mount", "images/rootfs.img", "rootfs"])
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 5:
         error("Wrong number of arguments")
@@ -121,25 +159,19 @@ if __name__ == "__main__":
     devices = add_devices(args.get("devices", ""))
     python_packages = add_packages(arch, args.get("python-packages", ""))
 
-    optional_tasks = devices | python_packages
+    optional_tasks: Dict[str, Dict[str, str]] = devices | python_packages
 
     add_repos(args.get("repos", ""))
-
-    image = args.get("image", "")
-    if image.strip() == "":
-        image = DEFAULT_IMAGE_PATH.format(action_repo, action_ref, arch)
-
-    if image != "none":
-        burn_rootfs_image(
-            user_directory,
-            image,
-            arch,
-            args.get("rootfs-size", "auto"),
-            args.get("image-type", "native")
-        )
+    prepare_image(
+        user_directory,
+        args.get("image", ""),
+        arch,
+        args.get("rootfs-size", "auto"),
+        args.get("image-type", "native"),
+    )
 
     for it, custom_task in enumerate(args.get("tasks", "").splitlines()):
-        get_file(custom_task, f"action/user_tasks/task{it}.yml")
+        get_file(f"{user_directory}/{custom_task}", f"action/user_tasks/task{it}.yml")
 
     dispatcher = CommandDispatcher(board, {
         "NOW": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
@@ -157,10 +189,8 @@ if __name__ == "__main__":
 
     dispatcher.evaluate()
 
-    run(["mkdir", "rootfs"], check=True)
-
-    if image != "none":
-        run(["sudo", "mount", "images/rootfs.img", "rootfs"], check=True)
+    for command in commands:
+        run(command, check=True)
 
     for dir in shared_directories_actions:
         src = f"rootfs/{dir.target}"
