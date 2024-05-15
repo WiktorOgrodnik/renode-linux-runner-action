@@ -44,7 +44,7 @@ commands = [
 
 
 def configure_board(user_directory: str,
-                    _: str,
+                    custom_config: str,
                     arch: str,
                     board: str,
                     resc: str,
@@ -63,6 +63,10 @@ def configure_board(user_directory: str,
     repl: str
         custom repl: URL or path
     """
+
+    if custom_config != "none":
+        get_file(custom_config, "action/device/custom", path_context=user_directory)
+        return (arch, "custom")
 
     if arch not in archs:
         error("Architecture not supportted!")
@@ -139,7 +143,7 @@ if __name__ == "__main__":
 
     arch, board = configure_board(
         user_directory,
-        args.get("device-config", "none"),
+        args.get("custom-config", "none"),
         args.get("arch", "riscv64"),
         args.get("board", "default"),
         args.get("resc", "default"),

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from dataclasses import dataclass
+from os.path import isdir
 from urllib.parse import urlparse
 from typing import Dict
 
@@ -138,8 +139,12 @@ def get_file(path_or_url: str, target_path: str, path_context: str = "/"):
     if target_path.find('/') != -1:
         os.makedirs("/".join(target_path.split("/")[:-1]), exist_ok=True)
 
-    if os.path.isfile(path_or_url) or os.path.isfile(f"{path_context}/{path_or_url}"):
-        shutil.move(path_or_url, target_path)
+    files_proposition = [path_or_url, f"{path_context}/{path_or_url}"]
+
+    files = [file for file in files_proposition if os.path.isfile(file) or os.path.isdir(file)]
+
+    if len(files) > 0:
+        shutil.move(files[0], target_path)
     elif is_url(path_or_url):
         try:
             r = requests.get(path_or_url)

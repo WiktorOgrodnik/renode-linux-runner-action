@@ -27,6 +27,10 @@ inputs:
     description: Board
     required: false
     default: default
+  custom-config:
+    description: Custom board configuration
+    required: false
+    default: none
   resc:
     description: Renode script
     required: false
@@ -67,10 +71,6 @@ inputs:
     description: Fail fast
     required: false
     default: "true"
-  device-config:
-    description: Renode device configuration (example at action/devices)
-    required: false
-    default: ""
   tasks:
     description: Add your tasks to the existing configuration
     required: false
