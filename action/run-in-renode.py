@@ -74,10 +74,10 @@ def configure_board(user_directory: str,
         error("You have to provide resc and repl for custom board")
 
     if resc != "default":
-        get_file(f"{user_directory}/{resc}", f"action/device/{board}/init.resc")
+        get_file(resc, f"action/device/{board}/init.resc", path_context=user_directory)
 
     if repl != "default":
-        get_file(f"{user_directory}/{repl}", f"action/device/{board}/platform.repl")
+        get_file(resc, f"action/device/{board}/platform.repl", path_context=user_directory)
 
     return (arch, board)
 
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     )
 
     for it, custom_task in enumerate(args.get("tasks", "").splitlines()):
-        get_file(f"{user_directory}/{custom_task}", f"action/user_tasks/task{it}.yml")
+        get_file(custom_task, f"action/user_tasks/task{it}.yml", path_context=user_directory)
 
     dispatcher = CommandDispatcher(board, {
         "NOW": str(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 from dataclasses import dataclass
-from os.path import isdir
 from urllib.parse import urlparse
 from typing import Dict
 
@@ -125,7 +124,7 @@ def is_url(url):
         return False
 
 
-def get_file(path_or_url: str, target_path: str):
+def get_file(path_or_url: str, target_path: str, path_context: str = "/"):
     """
     File downloader. Download the file from provide URL as filename
     or copy the file from path to filename.
@@ -139,7 +138,7 @@ def get_file(path_or_url: str, target_path: str):
     if target_path.find('/') != -1:
         os.makedirs("/".join(target_path.split("/")[:-1]), exist_ok=True)
 
-    if os.path.isfile(path_or_url) or os.path.isdir(path_or_url):
+    if os.path.isfile(path_or_url) or os.path.isfile(f"{path_context}/{path_or_url}"):
         shutil.move(path_or_url, target_path)
     elif is_url(path_or_url):
         try:

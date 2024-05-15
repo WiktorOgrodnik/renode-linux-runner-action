@@ -94,7 +94,7 @@ def prepare_kernel_and_initramfs(user_directory: str, kernel: str):
         path or URL to the kernel package
     """
 
-    get_file(f"{user_directory}/{kernel}", "kernel.tar.xz")
+    get_file(kernel, "kernel.tar.xz", path_context=user_directory)
 
     os.makedirs("images")
 
@@ -161,7 +161,7 @@ def burn_rootfs_image(
     os.makedirs("images/rootfs/home", exist_ok=True)
 
     if image_type == "native":
-        get_file(image, "rootfs.tar.xz")
+        get_file(image, "rootfs.tar.xz", path_context=user_directory)
         image = "rootfs.tar.xz"
     elif image_type == "docker":
         library, image, tag = docker_image_parse(image)
